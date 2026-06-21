@@ -6,7 +6,6 @@ import {
   MdOutlineKeyboardArrowDown,
 } from "react-icons/md";
 
-// import ScoreCard from "../components/ScoreCard";
 import AuthorityCard from "../components/AuthorityCard";
 import PageSpeedCard from "../components/PageSpeedCard";
 import PerformanceBreakdown from "../components/PerformanceBreakdown";
@@ -42,6 +41,8 @@ interface AnalysisResult {
   roadmap: { task: string; impact: string }[];
 }
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Results() {
   const location = useLocation();
   const state = location.state as { url: string } | null;
@@ -62,7 +63,7 @@ export default function Results() {
 
     const fetchAnalysis = async () => {
       try {
-        const res = await fetch("/api/analyze", {
+        const res = await fetch(`${API_URL}/api/analyze`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url }),
