@@ -33,7 +33,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.get("/", (_req, res) => {
-  res.send("L∞plyt backend is running.");
+  res.send("Looplyt backend is running.");
 });
 
 app.listen(PORT, () => {
