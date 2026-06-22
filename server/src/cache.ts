@@ -1,5 +1,5 @@
 import NodeCache from "node-cache";
-import type { CacheValue } from "@shared/types/cache";
+import type { CacheValue } from "./types/cache";
 
 /**
  * In-memory cache for website analysis results.
