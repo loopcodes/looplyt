@@ -13,7 +13,7 @@
   },
 
   // Include shared types for global type checking
-  "include": [
-    "shared"
-  ]
+//   "include": [
+//     "shared"
+// , "shared/types/cache.ts"  ]
 }

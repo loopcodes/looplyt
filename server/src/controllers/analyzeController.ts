@@ -5,7 +5,7 @@ import { getOpenPageRank } from "../services/openPageRank";
 import { generateAIAnalysis } from "../services/gemini";
 import { calculatePageSpeed } from "../services/pageSpeed";
 import { analysisCache } from "../cache";
-import type { CacheValue } from "../../../shared/types/cache";
+import type { CacheValue } from "@shared/types/cache";
 
 export async function analyzeController(url: string) {
   const cached = analysisCache.get(url) as CacheValue | undefined;
