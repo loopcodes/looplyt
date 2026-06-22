@@ -1,4 +1,4 @@
 export interface Screenshot {
-  type: "desktop" | "mobile" | "tablet";
+  type: "desktop";
   image: string;
 }

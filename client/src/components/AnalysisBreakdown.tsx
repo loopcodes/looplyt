@@ -1,18 +1,13 @@
 import ScoreCard from "./ScoreCard";
+import type { AnalysisResult } from "@shared/types/analysis";
 
 interface Props {
-  scores: {
-    ux: number;
-    accessibility: number;
-    seo: number;
-    performance: number;
-  };
-  authority: {
-    pageRank: number;
-  };
+  scores: AnalysisResult["scores"];
+  authority: AnalysisResult["authority"];
 }
 
 export default function AnalysisBreakdown({ scores, authority }: Props) {
+
   return (
     <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
       <h2 className="text-xl font-semibold mb-4 text-gray-700">
@@ -20,10 +15,16 @@ export default function AnalysisBreakdown({ scores, authority }: Props) {
       </h2>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <ScoreCard label="UX" score={scores.ux} />
-        <ScoreCard label="Accessibility" score={scores.accessibility} />
-        <ScoreCard label="SEO" score={scores.seo} />
-        <ScoreCard label="Performance" score={scores.performance} />
+        <ScoreCard label="UX" score={scores?.ux ?? null} />
+        <ScoreCard
+          label="Accessibility"
+          score={scores?.accessibility ?? null}
+        />
+        <ScoreCard label="SEO" score={scores?.seo ?? null} />
+        <ScoreCard
+          label="Performance"
+          score={scores?.performance ?? null}
+        />
         <ScoreCard
           label="Authority"
           score={Math.round(authority.pageRank * 10)}

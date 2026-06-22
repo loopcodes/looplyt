@@ -5,9 +5,10 @@ import { getOpenPageRank } from "../services/openPageRank";
 import { generateAIAnalysis } from "../services/gemini";
 import { calculatePageSpeed } from "../services/pageSpeed";
 import { analysisCache } from "../cache";
+import type { CacheValue } from "@shared/types/cache";
 
 export async function analyzeController(url: string) {
-  const cached = analysisCache.get(url);
+  const cached = analysisCache.get(url) as CacheValue | undefined;
 
   if (cached) {
     return cached;
@@ -16,58 +17,67 @@ export async function analyzeController(url: string) {
   try {
     const domain = new URL(url).hostname;
 
-    // Phase 1: fast parallel work
     const [siteData, screenshots, authority] = await Promise.all([
       scrapeWebsite(url),
       captureScreenshots(url),
       getOpenPageRank(domain),
     ]);
 
-    // Phase 2: Lighthouse (heavy + queued)
-    const lighthouseResult = await runLighthouse(url);
-    const pageSpeed = calculatePageSpeed(lighthouseResult.metrics);
-
-    const scores = lighthouseResult.scores;
-    const metrics = lighthouseResult.metrics;
-
-    // Safe Gemini fallback
-    let aiAnalysis: {
-      suggestions: string[];
-      roadmap: {
-        task: string;
-        impact: "High" | "Medium" | "Low";
-      }[];
-    } = {
-      suggestions: ["AI suggestions are temporarily unavailable."],
-      roadmap: [],
-    };
-
-    try {
-      aiAnalysis = await generateAIAnalysis({
-        siteData: siteData as SiteData,
-        scores,
-        authority,
-        url,
-      });
-    } catch (aiError) {
-      console.error("Gemini failed:", aiError);
-    }
-
-    const result = {
+    const initialResult: CacheValue = {
       analysis: {
-        scores,
+        scores: undefined,
+        metrics: undefined,
+        pageSpeed: null,
         authority,
-        metrics,
-        pageSpeed,
-        suggestions: aiAnalysis.suggestions,
-        roadmap: aiAnalysis.roadmap,
+        suggestions: ["Analyzing performance..."],
+        roadmap: [],
       },
       screenshots,
     };
 
-    analysisCache.set(url, result);
+    analysisCache.set(url, initialResult);
 
-    return result;
+    runLighthouse(url)
+      .then((lighthouseResult) => {
+        const pageSpeed = calculatePageSpeed(lighthouseResult.metrics);
+
+        const cached = analysisCache.get(url) as CacheValue | undefined;
+        if (!cached) return;
+
+        analysisCache.set(url, {
+          ...cached,
+          analysis: {
+            ...cached.analysis,
+            scores: lighthouseResult.scores,
+            metrics: lighthouseResult.metrics,
+            pageSpeed,
+          },
+        });
+      })
+      .catch(console.error);
+
+    generateAIAnalysis({
+      siteData: siteData as SiteData,
+      scores: null,
+      authority,
+      url,
+    })
+      .then((aiAnalysis) => {
+        const cached = analysisCache.get(url) as CacheValue | undefined;
+        if (!cached) return;
+
+        analysisCache.set(url, {
+          ...cached,
+          analysis: {
+            ...cached.analysis,
+            suggestions: aiAnalysis.suggestions,
+            roadmap: aiAnalysis.roadmap,
+          },
+        });
+      })
+      .catch(console.error);
+
+    return initialResult;
   } catch (err) {
     console.error("Analysis failed:", err);
     throw err;

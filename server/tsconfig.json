@@ -6,7 +6,16 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "outDir": "./dist",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    //expand rootDir to accept shared type//
+    "rootDir": "..",
+  
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["../shared/*"]
+    }
   },
-  "include": ["src/**/*"]
+
+  "include": ["src"]
 }
