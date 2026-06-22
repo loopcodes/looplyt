@@ -1,5 +1,4 @@
 import NodeCache from "node-cache";
-import type { AnalysisResult } from "@shared/types/analysis";
 import type { CacheValue } from "@shared/types/cache";
 
 /**
