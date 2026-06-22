@@ -16,9 +16,30 @@ import Roadmap from "../components/Roadmap";
 import Navbar from "../components/Navbar";
 import OverallScore from "../components/OverallScore";
 import AnalysisLoader from "../components/Loader";
-import type { Screenshot } from "@shared/types/screenshot";
-import type { AnalysisResult } from "@shared/types/analysis";
+import type { Screenshot } from "../types/screenshot";
 
+interface AnalysisResult {
+  scores: {
+    ux: number;
+    accessibility: number;
+    seo: number;
+    performance: number;
+  };
+  metrics: {
+    lcp: number | null;
+    speedIndex: number | null;
+    tbt: number | null;
+    cls: number | null;
+  };
+  pageSpeed: number | null;
+  authority: {
+    rank: string | null;
+    pageRank: number;
+    pageRankInteger: number;
+  };
+  suggestions: string[];
+  roadmap: { task: string; impact: string }[];
+}
 
 const API_URL = import.meta.env.VITE_API_URL;
 

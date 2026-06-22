@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import type { Screenshot } from "@shared/types/screenshot";
+import type { Screenshot } from "../types/screenshot";
 
 interface Props {
   screenshots: Screenshot[];

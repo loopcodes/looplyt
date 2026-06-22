@@ -1,40 +1,49 @@
 import { useEffect, useState } from "react";
-import type { AnalysisResult } from "@shared/types/analysis";
 
 interface Props {
-  scores: AnalysisResult["scores"];
-  authority: AnalysisResult["authority"];
+  scores: {
+    ux: number;
+    accessibility: number;
+    seo: number;
+    performance: number;
+  };
+    authority: {
+    rank: string | null;
+    pageRank: number;
+    pageRankInteger: number;
+  };
 }
 
 export default function OverallScore({ scores, authority }: Props) {
-  const authorityScore = Math.min((authority.pageRank ?? 0) * 10, 100);
+const authorityScore = Math.min(authority.pageRank * 10, 100);
 
-  const overall =
-    scores
-      ? (
-          (scores.ux ?? 0) * 0.25 +
-          (scores.accessibility ?? 0) * 0.2 +
-          (scores.seo ?? 0) * 0.25 +
-          (scores.performance ?? 0) * 0.25 +
-          authorityScore * 0.05
-        )
-      : 0;
+const overall =
+  (
+  scores.ux * 0.25 +
+  scores.accessibility * 0.2 +
+  scores.seo * 0.25 +
+  scores.performance * 0.25 +
+  authorityScore * 0.05
+  );
 
   const percent = Math.round(overall);
 
+  // 🎯 Animated number state
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
-    const duration = 800;
+    const duration = 800; // ms
     const startTime = performance.now();
 
     const animate = (time: number) => {
       const elapsed = time - startTime;
       const t = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - t, 3);
-      setDisplayValue(Math.floor(eased * percent));
+      const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+      const value = Math.floor(eased * percent);
 
-      if (t < 1) {
+      setDisplayValue(value);
+
+      if (eased < 1) {
         requestAnimationFrame(animate);
       }
     };
@@ -42,30 +51,32 @@ export default function OverallScore({ scores, authority }: Props) {
     requestAnimationFrame(animate);
   }, [percent]);
 
+  // Circle settings
   const radius = 70;
   const stroke = 10;
   const circumference = 2 * Math.PI * radius;
   const progress = (displayValue / 100) * circumference;
 
-  const getLabel = (value: number) => {
-    if (value >= 90) return "You're doing almost everything right";
-    if (value >= 80) return "Just a few minor improvements left";
-    if (value >= 70) return "There's clear room to level up";
-    if (value >= 60) return "Users will notice some friction";
-    if (value >= 50) return "Important issues need attention";
-    return "This needs serious improvement";
-  };
+  // Labels
+const getLabel = (value: number) => {
+  if (value >= 90) return "You're doing almost everything right";
+  if (value >= 80) return "Just a few minor improvements left";
+  if (value >= 70) return "There's clear room to level up";
+  if (value >= 60) return "Users will notice some friction";
+  if (value >= 50) return "Important issues need attention";
+  return "This needs serious improvement";
+};
 
   const label = getLabel(displayValue);
 
   return (
     <div className="flex flex-col items-center justify-center text-center space-y-3">
-      <h2 className="text-xl font-semibold text-gray-700">
-        Overall Score
-      </h2>
+      <h2 className="text-xl font-semibold text-gray-700">Overall Score</h2>
 
+      {/* Circle */}
       <div className="relative w-40 h-40">
         <svg className="w-full h-full transform -rotate-90">
+          {/* Background circle */}
           <circle
             cx="80"
             cy="80"
@@ -75,6 +86,7 @@ export default function OverallScore({ scores, authority }: Props) {
             fill="transparent"
           />
 
+          {/* Progress circle */}
           <circle
             cx="80"
             cy="80"
@@ -85,20 +97,21 @@ export default function OverallScore({ scores, authority }: Props) {
             strokeDasharray={circumference}
             strokeDashoffset={circumference - progress}
             strokeLinecap="round"
+            className="transition-all duration-300 ease-out"
           />
         </svg>
 
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="text-5xl font-extrabold text-indigo-700 tabular-nums">
+        {/* Score text (ANIMATED) */}
+        <div className="absolute inset-0 flex tabular-nums tracking-tight flex-col items-center justify-center">
+          <div className="text-5xl font-extrabold text-indigo-700">
             {displayValue}
           </div>
-          <div className="text-xs text-gray-500">/ 100</div>
+          <div className="text-xs  text-gray-500">/ 100</div>
         </div>
       </div>
 
-      <div className="text-sm font-medium text-gray-600">
-        {scores ? label : "Analyzing performance..."}
-      </div>
+      {/* Label */}
+      <div className="text-sm font-medium text-gray-600">{label}</div>
     </div>
   );
 }

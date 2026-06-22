@@ -33,7 +33,7 @@ export async function generateAIAnalysis({
   url,
 }: {
   siteData: SiteData;
-  scores: Scores | null;
+  scores: Scores;
   authority: Authority;
   url: string;
 }): Promise<AIOutput> {
@@ -52,10 +52,10 @@ SITE DATA:
 - Headings: ${siteData.headings.join(", ")}
 
 SCORES:
-- UX: ${scores?.ux ?? "N/A"}
-- Accessibility: ${scores?.accessibility ?? "N/A"}
-- SEO: ${scores?.seo ?? "N/A"}
-- Performance: ${scores?.performance ?? "N/A"}
+- UX: ${scores.ux}
+- Accessibility: ${scores.accessibility}
+- SEO: ${scores.seo}
+- Performance: ${scores.performance}
 
 AUTHORITY:
 - PageRank: ${authority.pageRank}
