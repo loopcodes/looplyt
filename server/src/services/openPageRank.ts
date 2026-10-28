@@ -11,7 +11,7 @@ export async function getOpenPageRank(
 ): Promise<OpenPageRankResult> {
   try {
     const response = await axios.get(
-      "https://openpagerank.com/api/v1.0/getPageRank",
+      "https://api.keywordseverywhere.com/v1/getPageRank",
       {
         params: {
           domains: [domain],
